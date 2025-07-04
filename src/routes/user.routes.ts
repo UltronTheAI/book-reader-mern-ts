@@ -12,13 +12,4 @@ userRouter.put('/books/:bookId/like', authenticateToken, userController.likeOrUn
 userRouter.put('/chapters/:chapterId/like', authenticateToken, userController.likeOrUnlikeChapter);
 userRouter.put('/comments/:commentId/like', authenticateToken, userController.likeOrUnlikeComment);
 
-//post new comment using chapterId 
-// userRouter.post('/chapters/:chapterId/comments', authenticateToken, userController.addNewComment); 
-// userRouter.put('/comments/:commentId', authenticateToken, userController.updateComment);
-
-// userRouter.delete('/comments/:commentId', authenticateToken, commentController.deleteComment);
-
-// userRouter.get('/chapters/:chapterId/comments', userController.readComments);
-
-
 export default userRouter;

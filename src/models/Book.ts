@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { Genre, bookStatus } from '../validators/book.schema';
+import { Genre, bookStatus, bookStatusEnum, genreEnum } from '../validators/book.schema';
 
 export interface IBook extends mongoose.Document{
     _id: mongoose.Types.ObjectId,
@@ -36,13 +36,13 @@ const bookSchema = new mongoose.Schema<IBook>({
     genre:[
         {
             type: String,
-            enum: ["fiction", "horror", "action", "adventure"], //enum 
+            enum: genreEnum.options, //enum 
             default:"horror",
         }
     ],  
     status: {
         type: String,
-        enum: ["completed", "ongoing", "drafted" ], //enum 
+        enum: bookStatusEnum.options, //enum 
         default: "drafted",
     }, 
     coverImage: {

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const genreEnum = z.enum(["fiction" , "horror" , "action" , "adventure"]);
+export const genreEnum = z.enum(["fiction" , "horror" , "action" , "adventure", "sci-fi"]);
 export type Genre = z.infer<typeof genreEnum>;
 
 export const bookStatusEnum = z.enum(["completed" , "ongoing" , "drafted"]); //this for zod validation

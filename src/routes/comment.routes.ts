@@ -1,9 +1,7 @@
-
 import express from 'express';
 import * as commentController from '../controllers/comment.controller';
 import authenticateToken from '../middleware/authenticateToken';
 import authorizeRole from '../middleware/authorizeRole';
-
 
 const commentRouter = express.Router();
 
