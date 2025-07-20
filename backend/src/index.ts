@@ -11,7 +11,7 @@ import { checkAndSeedDatabase } from './utils/seedUtils';
 import checkAndInitializeAdmin from './utils/adminInitializer';
 
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 const app = express();
 app.use(express.json());
 
