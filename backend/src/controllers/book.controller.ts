@@ -43,10 +43,7 @@ export async function deleteBook(req: Request, res: Response){
   try {
     const { id } = req.params;
     const deletedBook = await bookService.deleteBook(id);
-    if (!deletedBook) {
-      res.status(404).json({ message: "deletion of book failed" });
-      return;
-    }
+    
     res.status(200).json({ success: true, data: deletedBook});   
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -58,10 +55,6 @@ export async function deleteAllBooks(req: Request, res: Response){
   try {
     const query =req.query;
     const deletedBook = await bookService.deleteAllBooks(query);
-    if (!deletedBook) {
-      res.status(404).json({ success: false, message: "deletion of all book failed" });
-      return;
-    }
     res.status(200).json({success: true, data: deletedBook});   
   } catch (error: any) {
     res.status(500).json({ error: error.message }); 
@@ -74,9 +67,6 @@ export async function getBooksCount(req: Request, res: Response): Promise<void> 
   try {
     const  query = req.query;
     const book = await bookService.countBooks(query);
-    if(!book){
-     res.status(404).json({ success: false, message: "No books found" });
-    }
     res.status(200).json({ success: true, data: book});
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -87,26 +77,55 @@ export async function getBooksCount(req: Request, res: Response): Promise<void> 
 export async function getBook(req: Request, res: Response): Promise<void>  {
   try {
     const book = await bookService.findBook(req.params.id);
-    if(!book){
-     res.status(404).json({ success: false, message: "No books found" });
-    }
     res.status(200).json({ success: true, data: book});
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 }
 
+//this is for homepage
+//this show all books in pages 20 per page
+//returns 
+//books-> name id image  
+// three latest chapters
+//  with their name chapterNo createdAt
+export async function getAllBooks(req: Request, res: Response): Promise<void>  {
+  try {
+    //we get page as string we convert it to number
+    const { page } = req.query; 
+    const pageNo = parseInt(page as string ,10);
+   
+    const books = await bookService.findBooks(pageNo);
+    const count = await bookService.countBooks();
+    const totalPages = Math.ceil(count/20); //total = bookCount/limit //eg 102/20 -> 6 pages 
+    res.status(200).json({
+      success: true,
+      totalBooks: count,
+      totalPages: totalPages,
+      data: books
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+
+//get books by
+// searching with text -> searches text in title n description
+//with filters like genre bookStatus 
+//sort by createdAt and order 
+//in paging
 export async function getBooksWithFilters(req: Request, res: Response): Promise<void>  {
   try {
     //for now not using zod validation schema for this 
     const {
-        genre,
-        status,
-        keyword,
-        sortBy = "createdAt",
-        order = "asc",   
-        page = "1",
-        limit = "10",
+      genre,
+      status,
+      keyword,
+      sortBy = "createdAt", //default
+      order = "asc",        //default
+      page = "1",           //starting page -> 1
+      limit = "20",         //20 books per page
     } = req.query;
 
     const pageNumber = parseInt(page as string, 10 );
@@ -123,13 +142,17 @@ export async function getBooksWithFilters(req: Request, res: Response): Promise<
     }
     if(genre){
       if(Array.isArray(genre)){
-        query.genre = { $in : genre}; //{ genre: { $in: [...] } } //mongoose needs this in array
+        // genre is an array like ["fiction", "horror"]
+        query.genre = { $in : genre}; 
+        // This becomes: { genre: { $in: ["fiction", "horror"] } } //this is what mongoose needs
+        // mongoose will match any of these genres
       }else{
-        query.genre = genre; //{ genre: "fiction" }// this in string ok
+        // This becomes: { genre: "fiction" }
+        // Mongoose will match exactly this genre
+        query.genre = genre; 
       }
     }
     
-
     //sort by what
     //sortBy createdAt updatedAt readCount title 
     //defines the way to sort this 
@@ -152,11 +175,20 @@ export async function getBooksWithFilters(req: Request, res: Response): Promise<
    
     if(books.length === 0){//
      res.status(404).json({ message: "No books found" });
+     return;
     }
-    res.status(200).json({success: true, data: books});
+
+    const count = await bookService.countBooks(query);//bookCount based on query 
+    const totalPages = Math.ceil(count/20);           //eg 102/20 -> 6 pages
+  
+    res.status(200).json({
+      success: true,
+      totalBooks: count,
+      totalPages: totalPages,
+      data: books,
+    });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 }
-
 

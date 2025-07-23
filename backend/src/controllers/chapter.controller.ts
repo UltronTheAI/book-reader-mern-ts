@@ -86,8 +86,8 @@ export async function deleteAllChapters(req: Request, res: Response): Promise<vo
   }
 }
 
-//like preview 
-//find all chapters //but only _id title chapterNumber
+//inside book we can view details of all chapters  
+//but only _id title chapterNumber
 export async function getChaptersByBookId(req: Request, res: Response): Promise<void>  {
   try {
     const { bookId } = req.params;
@@ -97,11 +97,6 @@ export async function getChaptersByBookId(req: Request, res: Response): Promise<
     res.status(500).json({success: false, error: error.message });
   }
 }
-
-//  $lt ->  less than
-//  $gt ->  greater than 
-// $lte ->  less than or equal
-// $gte	->  greater or equal
 
 // Get current chapter
 // Get previous and next chapters by order field
@@ -134,3 +129,9 @@ export async function getChapterWithNavigation(req: Request, res: Response): Pro
     res.status(500).json({success: false, error: error.message });
   }
 }
+
+
+//  $lt ->  less than
+//  $gt ->  greater than 
+// $lte ->  less than or equal
+// $gte	->  greater or equal

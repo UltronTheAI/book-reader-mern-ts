@@ -1,11 +1,12 @@
 import express from 'express';
-import authenticateToken from '../middleware/authenticateToken';
-import authorizeRole from '../middleware/authorizeRole';
+import authenticateToken from '../middleware/authenticateToken.middleware';
+import authorizeRole from '../middleware/userCheck.middleware';
 import * as bookController from '../controllers/book.controller';
 
 const bookRouter = express.Router();
 
 // READ
+bookRouter.get('/books', bookController.getAllBooks);
 bookRouter.get('/books/:id', bookController.getBook);
 bookRouter.get('/books/filter', bookController.getBooksWithFilters);
 bookRouter.get('/books/count', bookController.getBooksCount);

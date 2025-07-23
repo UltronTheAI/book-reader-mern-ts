@@ -1,7 +1,7 @@
 import express from 'express';
 import * as chapterController from '../controllers/chapter.controller';
-import authenticateToken from '../middleware/authenticateToken'
-import authorizeRole from '../middleware/authorizeRole';
+import authenticateToken from '../middleware/authenticateToken.middleware'
+import authorizeRole from '../middleware/userCheck.middleware';
 
 const chapterRouter = express.Router();
 

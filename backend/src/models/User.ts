@@ -10,6 +10,11 @@ export interface IUser extends mongoose.Document{
     role: Role, //ts needs this //  type  "admin" | "reader" // or Role  
     likedBooks: mongoose.Types.ObjectId[],
     favouriteChapters: mongoose.Types.ObjectId[],
+
+    isEmailVerified: boolean,    //email verification
+    verificationToken?: string;  
+    verificationTokenExpires?: Date,
+    
     createdAt?:Date,
     updatedAt?:Date,
 }
@@ -55,6 +60,11 @@ const UserSchema = new mongoose.Schema<IUser>({
             ref: "Chapter",
         }
     ],
+
+    //email verification
+    isEmailVerified:{type: Boolean, default: false,},
+    verificationToken: {type: String},
+    verificationTokenExpires: { type: Date },
 
 }, { timestamps: true });
 

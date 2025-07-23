@@ -1,17 +1,17 @@
 import express from 'express';
-import * as commentController from '../controllers/comment.controller';
-import authenticateToken from '../middleware/authenticateToken';
-import authorizeRole from '../middleware/authorizeRole';
+import * as cController from '../controllers/comment.controller';
+import authenticateToken from '../middleware/authenticateToken.middleware';
+import authorizeRole, { requireEmailVerified } from '../middleware/userCheck.middleware';
 
-const commentRouter = express.Router();
+const router = express.Router();
 
-commentRouter.get('/chapters/:chapterId/comments', commentController.readComments);
+router.get('/chapters/:chapterId/comments', cController.readComments);
 
 // post new comment using chapterId 
-commentRouter.post('/chapters/:chapterId/comments', authenticateToken, commentController.addNewComment); 
-commentRouter.put('/comments/:commentId', authenticateToken, commentController.updateComment);
+router.post('/chapters/:chapterId/comments', authenticateToken, requireEmailVerified, cController.addNewComment); 
+router.put('/comments/:commentId', authenticateToken, requireEmailVerified, cController.updateComment);
 
-commentRouter.delete('/comments/:commentId', authenticateToken, commentController.deleteCommentsContent);
-commentRouter.delete('/comments/:commentId/hard', authenticateToken, authorizeRole("admin"), commentController.deleteComment);
+router.delete('/comments/:commentId', authenticateToken, requireEmailVerified, cController.deleteCommentsContent);
+router.delete('/comments/:commentId/hard', authenticateToken, authorizeRole("admin"), cController.deleteComment);
 
-export default commentRouter;
+export default router;

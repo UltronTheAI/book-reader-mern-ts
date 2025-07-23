@@ -1,6 +1,7 @@
-import Chapter from "../models/Chapter";
-import Comment from "../models/Comment";
+import Chapter, { IChapter } from "../models/Chapter";
+import Comment, { IComment } from "../models/Comment";
 import User from "../models/User";
+import {nestedComments} from "../utils/comment.utils";
 
 export async function addNewComment(userId: string, chapterId: string, parentCommentId: string, content: string) {
   const user = await User.findById(userId);
@@ -60,17 +61,33 @@ export async function updateComment(userId: string, commentId: string, content: 
   return updatedComment;
 }
 
-export async function countComments( query = {}){
-  const count = await Comment.countDocuments(query);
+export async function countComments(chapterId: string){
+  const chapter = await Chapter.findById(chapterId);
+  if(!chapter) {
+    throw new Error('Chapter not found by countComments');
+  }
+  //counting all comments of chapter which has isDeleted: false
+  const count = await Comment.countDocuments( {chapterId, isDeleted: false} );
   return count;
 }
 
+//not used
+//this will display comments randomly no threading 
 export async function readComments(chapterId: string){
   const comments = await Comment.find({ chapterId })
-    .sort({ createdAt: 1 }) // oldest first by default
-    .populate('userId', 'email');
+    .sort({ sortBy: -1 })       // newest is big in time
+    .populate('userId', 'email');//populate with username userId avatar //standard
   return comments;
 }
+
+//this willmake proper structure for comments
+export async function readCommentsStructured(chapterId: string, sortBy: "createdAt" | "likes"){
+  const comments = await Comment.find({ chapterId })
+    .sort({ sortBy: -1 }) // newest is big in time
+    .populate('userId', 'email');
+  return nestedComments(comments, sortBy);//calling utils 
+}
+
 
 //soft delete 
 export async function deleteCommentsContent(userId: string, commentId: string) {
@@ -93,6 +110,7 @@ export async function deleteCommentsContent(userId: string, commentId: string) {
   return updatedComment;
 }
 
+//hard delete
 export async function deleteComment(userId: string, commentId: string) {
   const user = await User.findById(userId);
   if(!user) {
@@ -106,7 +124,7 @@ export async function deleteComment(userId: string, commentId: string) {
   if(comment.userId?.toString() !== userId.toString()){//dont need to check for child comments 
     throw new Error('unauthorized: comment doesnot belong to user');
   }
-  await deleteCommentAndReplies(commentId);
+  await deleteCommentAndReplies(commentId);//deleting all linked comments
   return comment;
 }
 

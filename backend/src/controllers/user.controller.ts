@@ -1,3 +1,4 @@
+import { sendVerificationMail } from '../services/mail.service';
 import * as userService from '../services/user.service';
 import { Request, Response } from 'express';
 
@@ -29,6 +30,8 @@ export async function changeUserRole(req: Request, res: Response): Promise<void>
   }
 }
 
+
+//this all needs to have verified email to continue
 export async function likeOrUnlikeBook(req: Request, res: Response): Promise<void>  {
   try {
     const { bookId } = req.params;//get from params

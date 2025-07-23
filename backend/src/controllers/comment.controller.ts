@@ -1,6 +1,12 @@
 import * as userService from '../services/comment.service';
 import { Request, Response } from 'express';
 
+
+//to comment user needs to have verified email 
+//otherwise cannot  comment 
+//redirect them to verify email page 
+
+
 //needs chapterId params
 //needs userId content from body
 export async function addNewComment(req: Request, res: Response): Promise<void>  {
@@ -9,8 +15,8 @@ export async function addNewComment(req: Request, res: Response): Promise<void> 
     const { content, parentCommentId } = req.body;
     
     const userId = req.user?.id;
-    if(!userId) {
-      res.json( {success: false, message: "internal request error"});
+    if(!userId ) {
+      res.json( {success: false, message: "User not loggedIn"});
       return;
     } 
     const comment = await userService.addNewComment(userId, chapterId, parentCommentId, content);
@@ -28,7 +34,7 @@ export async function updateComment(req: Request, res: Response): Promise<void> 
 
     const userId = req.user?.id;
     if(!userId) {
-      res.json( {success: false, message: "internal request error"});
+      res.json( {success: false, message: "User not loggedIn or internal request error"});
       return;
     } 
     const comment = await userService.updateComment(userId, commentId, content );
@@ -77,13 +83,27 @@ export async function deleteComment(req: Request, res: Response): Promise<void> 
 export async function readComments(req: Request, res: Response): Promise<void>  {
   try {
     const { chapterId } = req.params;
-    const comments = await userService.readComments(chapterId);
+    const sortByQuery = req.query.sortBy;
+
+    
+    const sortBy = sortByQuery === "createdAt" ? "createdAt": "likes";
+    const comments = await userService.readCommentsStructured(chapterId, sortBy);
     res.json( {success: true, comment: comments} );
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
 }
 
+export async function countComments(req: Request, res: Response): Promise<void>  {
+  try {
+    const { chapterId } = req.params;
+    const count = await userService.countComments(chapterId);
+    
+    res.json( {success: true, total: count} );
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+}
 
 // export async function readCommentsWithFilters(req: Request, res: Response): Promise<void>  {
 //   try {

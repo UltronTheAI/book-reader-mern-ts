@@ -1,7 +1,7 @@
-import User from "../models/User.js";
-import Comment from "../models/Comment.js";
-import Chapter from "../models/Chapter.js";
-import Book from "../models/Book.js";
+import User from "../models/User";
+import Comment from "../models/Comment";
+import Chapter from "../models/Chapter";
+import Book from "../models/Book";
 import mongoose from "mongoose";
 
 export async function changeUserRole( id: string, role: string) {
@@ -73,4 +73,3 @@ export async function likeOrUnlikeComment(userId: string, commentId: string) {
   await comment.save(); 
   return comment;
 }
-
